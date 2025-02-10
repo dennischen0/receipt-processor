@@ -5,26 +5,21 @@ class ReceiptsController < ApplicationController
 
     def initialize
         super
-      end
+    end
 
     def process_receipt
         receipt_id = SecureRandom.uuid
 
         retailer, purchase_date, purchase_time, total, items = params.expect(:retailer, :purchaseDate, :purchaseTime, :total, items: [[:shortDescription, :price]])
 
-        # items = params.expect(items: [[:shortDescription, :price]])
-
-        p "================"
-        p items[0][:shortDescription]
-        p items[0][:price]
-        p "================"
-
         receipt_data = { retailer: retailer, purchase_date: purchase_date, purchase_time: purchase_time, total: total, items: items }
 
         points = calculate_points(receipt_data)
 
         Rails.cache.write(receipt_id, points)
-        render json: { message: "Receipt processed successfully", data: receipt_data, id: receipt_id }
+        render json: { id: receipt_id }
+    rescue => e
+        render json: { error: "Invalid request" }, status: :bad_request
     end
 
     def points
@@ -43,10 +38,8 @@ class ReceiptsController < ApplicationController
         total_points += get_price_points(receipt_data[:total])
         total_points += get_item_points(receipt_data[:items])
         total_points += get_date_points(receipt_data[:purchase_date])
-        # total_points += get_time_points(receipt_data[:purchase_time])
-
-        p total_points
-        p "==============="
+        total_points += get_time_points(receipt_data[:purchase_time])
+        
         total_points
     end
 
@@ -65,14 +58,27 @@ class ReceiptsController < ApplicationController
     end
 
     def get_item_points(items)
-        items.count / 2
+        item_points = 0
+        
+        item_points += items.count / 2 * 5
+
+        items.each do |item|
+            description = item[:shortDescription].strip # strip leading and trailing whitespace
+            multiple_of_three = description.length % 3 == 0 ? true : false
+            
+            item_points += (item[:price].to_f * 0.2 ).ceil if multiple_of_three
+        end
+
+        item_points
     end
 
     def get_date_points(purchase_date)
-
+        date = Date.parse(purchase_date)
+        date.day.odd? ? 6 : 0
     end
 
     def get_time_points(purchase_time)
-
+        time = Time.parse(purchase_time)
+        (time.hour == 14 && time.min > 0) || time.hour == 15 ? 10 : 0
     end
 end
