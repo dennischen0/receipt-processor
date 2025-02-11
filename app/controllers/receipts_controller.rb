@@ -1,21 +1,17 @@
 require 'securerandom'
 
 class ReceiptsController < ApplicationController
-
-
     def initialize
         super
     end
 
     def process_receipt
-        receipt_id = SecureRandom.uuid
-
         retailer, purchase_date, purchase_time, total, items = params.expect(:retailer, :purchaseDate, :purchaseTime, :total, items: [[:shortDescription, :price]])
-
         receipt_data = { retailer: retailer, purchase_date: purchase_date, purchase_time: purchase_time, total: total, items: items }
 
         points = calculate_points(receipt_data)
 
+        receipt_id = SecureRandom.uuid
         Rails.cache.write(receipt_id, points)
         render json: { id: receipt_id }
     rescue => e
@@ -60,8 +56,9 @@ class ReceiptsController < ApplicationController
     def get_item_points(items)
         item_points = 0
         
-        item_points += items.count / 2 * 5
+        item_points += items.count / 2 * 5 # 5 points for every 2 items
 
+        # 20% of the price of each item whose description length is a multiple of 3
         items.each do |item|
             description = item[:shortDescription].strip # strip leading and trailing whitespace
             multiple_of_three = description.length % 3 == 0 ? true : false
@@ -79,6 +76,8 @@ class ReceiptsController < ApplicationController
 
     def get_time_points(purchase_time)
         time = Time.parse(purchase_time)
+
+        # 10 points if the purchase time is between 2:00 PM and 4:00 PM Exclusive
         (time.hour == 14 && time.min > 0) || time.hour == 15 ? 10 : 0
     end
 end

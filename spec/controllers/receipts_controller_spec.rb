@@ -128,7 +128,6 @@ RSpec.describe ReceiptsController, type: :controller do
           end
         end
 
-
         describe "#get_item_points" do
           before do
             allow_any_instance_of(ReceiptsController).to receive(:get_item_points).and_call_original

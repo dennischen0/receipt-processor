@@ -1,24 +1,46 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This README documents the steps necessary to get the application up and running.
 
-Things you may want to cover:
+## Prerequisites
 
-* Ruby version
+If using rails:
+- Ruby version: 3.0.0
+- Rails version: 6.1.4
 
-* System dependencies
+If using docker:
+- Docker
+- Docker Compose
 
-* Configuration
+## Usage instructions
 
-* Database creation
+### Using Docker
+1. Build the docker image
+```
+cd receipt-processor
+docker build -t receipt-processor .
+```
 
-* Database initialization
+2. Run the docker image
+```
+docker run -d -p 3000:3000 --name receipt-processor-container receipt-processor
+```
 
-* How to run the test suite
+The app will run on localhost:3000
 
-* Services (job queues, cache servers, search engines, etc.)
+### Using rails
+1. Install dependencies
+```
+cd receipts-processor
+bundle install
+```
 
-* Deployment instructions
+2. Run
+```
+rails s
+```
 
-* ...
+#### How to run the test suite
+```
+bundle exec rspec
+```
