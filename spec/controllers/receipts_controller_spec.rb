@@ -43,6 +43,15 @@ RSpec.describe ReceiptsController, type: :controller do
 
         expect(response).to have_http_status(:bad_request)
       end
+
+      context "when there are 0 items" do
+        let(:items) { [] }
+
+        it "returns bad request" do
+          post :process_receipt, params: receipt
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
     end
 
     describe "#calculate_points" do
@@ -133,17 +142,7 @@ RSpec.describe ReceiptsController, type: :controller do
             allow_any_instance_of(ReceiptsController).to receive(:get_item_points).and_call_original
           end
 
-          context "when there are 0 items" do
-            let(:items) { [] }
-
-            it "returns the correct total points" do
-              post :process_receipt, params: receipt
-              json_response = JSON.parse(response.body)
-              expect(response).to have_http_status(:bad_request)
-            end
-          end
-
-          context "when there are 1 item" do
+          context "when there is 1 item" do
             let(:items) { [{ shortDescription: "Item 1", price: "100.00" }] }
 
             it "returns the correct total points" do
@@ -249,9 +248,6 @@ RSpec.describe ReceiptsController, type: :controller do
     it "returns not found when the id is invalid" do
       get :points, params: { id: "non_existent_id" }
       expect(response).to have_http_status(:not_found)
-
-      json_response = JSON.parse(response.body)
-      expect(json_response["error"]).to eq("Not found")
     end
   end
 end

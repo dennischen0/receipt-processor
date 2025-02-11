@@ -15,7 +15,7 @@ class ReceiptsController < ApplicationController
         Rails.cache.write(receipt_id, points)
         render json: { id: receipt_id }
     rescue => e
-        render json: { error: "Invalid request" }, status: :bad_request
+        render status: :bad_request
     end
 
     def points
@@ -24,9 +24,11 @@ class ReceiptsController < ApplicationController
         if points
             render json: { "points": points}
         else
-            render json: { error: "Not found" }, status: :not_found
+            render status: :not_found
         end
     end
+
+    private
 
     def calculate_points(receipt_data)
         total_points = 0
