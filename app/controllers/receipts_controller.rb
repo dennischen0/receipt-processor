@@ -7,7 +7,13 @@ class ReceiptsController < ApplicationController
 
     def process_receipt
         retailer, purchase_date, purchase_time, total, items = params.expect(:retailer, :purchaseDate, :purchaseTime, :total, items: [[:shortDescription, :price]])
-        receipt_data = { retailer: retailer, purchase_date: purchase_date, purchase_time: purchase_time, total: total, items: items }
+        receipt_data = { 
+            retailer: retailer, 
+            purchase_date: purchase_date, 
+            purchase_time: purchase_time, 
+            total: total, 
+            items: items 
+        }
 
         points = calculate_points(receipt_data)
 
@@ -22,7 +28,7 @@ class ReceiptsController < ApplicationController
         points = Rails.cache.read(params[:id])
 
         if points
-            render json: { "points": points}
+            render json: { points: points}
         else
             render status: :not_found
         end
@@ -41,10 +47,12 @@ class ReceiptsController < ApplicationController
         total_points
     end
 
+    # Calculate points based on the retailer's name
     def get_retailer_name_points(retailer_name)
         retailer_name.count('A-Za-z0-9')
     end
 
+    # Calculate points based on the total price
     def get_price_points(total_price)
         price_points = 0
         price_float = total_price.to_f
@@ -54,7 +62,8 @@ class ReceiptsController < ApplicationController
 
         price_points
     end
-
+    
+    # Calculate points based on the items
     def get_item_points(items)
         item_points = 0
         
@@ -63,7 +72,7 @@ class ReceiptsController < ApplicationController
         # 20% of the price of each item whose description length is a multiple of 3
         items.each do |item|
             description = item[:shortDescription].strip # strip leading and trailing whitespace
-            multiple_of_three = description.length % 3 == 0 ? true : false
+            multiple_of_three = description.length % 3 == 0 
             
             item_points += (item[:price].to_f * 0.2 ).ceil if multiple_of_three
         end
@@ -71,11 +80,13 @@ class ReceiptsController < ApplicationController
         item_points
     end
 
+    # Calculate points based on the purchase date
     def get_date_points(purchase_date)
         date = Date.parse(purchase_date)
         date.day.odd? ? 6 : 0
     end
 
+    # Calculate points based on the purchase time
     def get_time_points(purchase_time)
         time = Time.parse(purchase_time)
 
