@@ -1,9 +1,6 @@
 require 'securerandom'
 
 class ReceiptsController < ApplicationController
-    def initialize
-        super
-    end
 
     def process_receipt
         retailer, purchase_date, purchase_time, total, items = params.expect(:retailer, :purchaseDate, :purchaseTime, :total, items: [[:shortDescription, :price]])
@@ -38,6 +35,7 @@ class ReceiptsController < ApplicationController
 
     def calculate_points(receipt_data)
         total_points = 0
+        
         total_points += get_retailer_name_points(receipt_data[:retailer])
         total_points += get_price_points(receipt_data[:total])
         total_points += get_item_points(receipt_data[:items])
@@ -57,8 +55,8 @@ class ReceiptsController < ApplicationController
         price_points = 0
         price_float = total_price.to_f
 
-        price_points += (price_float % 0.25).zero? ? 25 : 0
-        price_points += (price_float % 1).zero? ? 50 : 0
+        price_points += 25 if (price_float % 0.25).zero?
+        price_points += 50 if (price_float % 1).zero?
 
         price_points
     end
@@ -72,7 +70,7 @@ class ReceiptsController < ApplicationController
         # 20% of the price of each item whose description length is a multiple of 3
         items.each do |item|
             description = item[:shortDescription].strip # strip leading and trailing whitespace
-            multiple_of_three = description.length % 3 == 0 
+            multiple_of_three = (description.length % 3).zero?
             
             item_points += (item[:price].to_f * 0.2 ).ceil if multiple_of_three
         end
