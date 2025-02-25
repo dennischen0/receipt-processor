@@ -64,16 +64,16 @@ RSpec.describe ReceiptsController, type: :controller do
 
       context "test cases for each helper method" do
         before do
-          allow_any_instance_of(ReceiptsController).to receive(:get_retailer_name_points).and_return(0)
-          allow_any_instance_of(ReceiptsController).to receive(:get_price_points).and_return(0)
-          allow_any_instance_of(ReceiptsController).to receive(:get_item_points).and_return(0)
-          allow_any_instance_of(ReceiptsController).to receive(:get_date_points).and_return(0)
-          allow_any_instance_of(ReceiptsController).to receive(:get_time_points).and_return(0)
+          allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_retailer_name_points).and_return(0)
+          allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_price_points).and_return(0)
+          allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_item_points).and_return(0)
+          allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_date_points).and_return(0)
+          allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_time_points).and_return(0)
         end
         
         describe "#get_retailer_name_points" do
           before do
-            allow_any_instance_of(ReceiptsController).to receive(:get_retailer_name_points).and_call_original
+            allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_retailer_name_points).and_call_original
           end
           context "when the retailer name is different" do
             let(:retailer_name) { "Another Stores" }
@@ -105,7 +105,7 @@ RSpec.describe ReceiptsController, type: :controller do
 
         describe "#get_price_points" do
           before do
-            allow_any_instance_of(ReceiptsController).to receive(:get_price_points).and_call_original
+            allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_price_points).and_call_original
           end
           context "when the total price is a multiple of 1" do
             let(:total) { "15.00" }
@@ -139,7 +139,7 @@ RSpec.describe ReceiptsController, type: :controller do
 
         describe "#get_item_points" do
           before do
-            allow_any_instance_of(ReceiptsController).to receive(:get_item_points).and_call_original
+            allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_item_points).and_call_original
           end
 
           context "when there is 1 item" do
@@ -179,7 +179,7 @@ RSpec.describe ReceiptsController, type: :controller do
 
         describe "#get_date_points" do
           before do
-            allow_any_instance_of(ReceiptsController).to receive(:get_date_points).and_call_original
+            allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_date_points).and_call_original
           end
 
           context "when the purchase date is odd" do
@@ -205,7 +205,7 @@ RSpec.describe ReceiptsController, type: :controller do
 
         describe "#get_time_points" do
           before do
-            allow_any_instance_of(ReceiptsController).to receive(:get_time_points).and_call_original
+            allow_any_instance_of(ReceiptPointsCalculator).to receive(:get_time_points).and_call_original
           end
 
           context "when the purchase time is between 14:00 and 16:00" do

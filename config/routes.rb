@@ -5,16 +5,23 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  scope "/receipts" do
-    post "process", to: "receipts#process_receipt"
-    get ":id/points", to: "receipts#points"
+  # scope "/receipts" do
+  #   post "process", to: "receipts#process_receipt"
+  #   get ":id/points", to: "receipts#points"
+  #   # get "/", to: "receipts#index", as: :receipts
+  # end
+  resources :receipts, only: [:index, :create, :show] do
+    collection do
+      post 'process', to: 'receipts#process_receipt'
+    end
+
+    member do
+      get 'points', to: 'receipts#points'
+    end
   end
-
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
+  
+  # resources :receipts, only: [:index]
+  
   # Defines the root path route ("/")
   # root "posts#index"
 end

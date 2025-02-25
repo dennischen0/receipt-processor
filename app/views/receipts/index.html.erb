@@ -1,0 +1,19 @@
+<!-- filepath: /home/dennis/workspace/receipt-processor/app/views/receipts/index.html.erb -->
+<h1>Receipts</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Points</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @receipts.each do |id, points| %>
+      <tr>
+        <td><%= id %></td>
+        <td><%= points %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
